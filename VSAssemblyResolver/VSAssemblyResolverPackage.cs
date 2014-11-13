@@ -403,7 +403,7 @@ namespace SergejDerjabkin.VSAssemblyResolver
         {
 
             var dxToolboxAttribute = type.GetCustomAttributesData().FirstOrDefault(d =>
-                d.AttributeType.Name == "DXToolboxItemAttribute" || d.AttributeType.Name == "ToolboxItemAttribute");
+                d.Constructor.DeclaringType.Name == "DXToolboxItemAttribute" || d.Constructor.DeclaringType.Name == "ToolboxItemAttribute");
             if (dxToolboxAttribute != null)
             {
 
@@ -421,7 +421,7 @@ namespace SergejDerjabkin.VSAssemblyResolver
         private void MenuItemCallback(object sender, EventArgs e)
         {
             DynamicTypeService typeResolver = (DynamicTypeService)GetService(typeof(DynamicTypeService));
-            IVsToolboxService2 toolBoxService = GetService(typeof(IToolboxService)) as IVsToolboxService2;
+            IVsToolboxService toolBoxService = GetService(typeof(IToolboxService)) as IVsToolboxService;
 
             if (toolBoxService != null)
             {
@@ -455,7 +455,8 @@ namespace SergejDerjabkin.VSAssemblyResolver
                         }
                     }
                 }
-                toolBoxService.AddToolboxItems(items, null);
+                foreach (var item in items)
+                    toolBoxService.AddToolboxItem(item.Item2, item.Item1, null, Guid.Empty);
             }
             // Show a Message Box to prove we were here
             IVsUIShell uiShell = (IVsUIShell)GetService(typeof(SVsUIShell));
